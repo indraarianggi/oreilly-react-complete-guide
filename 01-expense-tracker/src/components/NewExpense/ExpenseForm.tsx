@@ -12,9 +12,10 @@ export type TExpenseData = Omit<IExpenseItem, "id">;
 
 type TExpenseFormProps = {
   onSaveExpenseData: (data: TExpenseData) => void;
+  onCancel: () => void;
 };
 
-const ExpenseForm = ({ onSaveExpenseData }: TExpenseFormProps) => {
+const ExpenseForm = ({ onSaveExpenseData, onCancel }: TExpenseFormProps) => {
   const initialUserInput: IUserInput = {
     title: "",
     amount: 0,
@@ -40,6 +41,7 @@ const ExpenseForm = ({ onSaveExpenseData }: TExpenseFormProps) => {
 
     onSaveExpenseData(expenseData);
     setUserInput(initialUserInput);
+    onCancel();
   };
 
   return (
@@ -83,6 +85,9 @@ const ExpenseForm = ({ onSaveExpenseData }: TExpenseFormProps) => {
         </div>
       </div>
       <div className="new-expense__actions">
+        <button type="button" onClick={onCancel}>
+          Cancel
+        </button>
         <button type="submit">Add Expense</button>
       </div>
     </form>
