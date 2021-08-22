@@ -1,3 +1,4 @@
+import ReactDOM from "react-dom";
 import styled from "styled-components";
 import Button from "./Button";
 import Card from "./Card";
@@ -48,20 +49,32 @@ export type TErrorModalProps = {
 };
 
 const ErrorModal = ({ title, message, onClose }: TErrorModalProps) => {
+  /**
+   *  Here, we using Portals (ReactDOM.createPortal) to render overlay and modal component
+   *  for better semantic HTML or DOM structure (check inspect element in browser)
+   */
+
   return (
     <>
-      <Overlay onClick={onClose} />
-      <ModalContainer>
-        <Card>
-          <ModalHeader>
-            <h2>{title}</h2>
-          </ModalHeader>
-          <ModalBody>{message}</ModalBody>
-          <ModalFooter>
-            <Button onClick={onClose}>Okay</Button>
-          </ModalFooter>
-        </Card>
-      </ModalContainer>
+      {ReactDOM.createPortal(
+        <Overlay onClick={onClose} />,
+        document.getElementById("overlay-root")!
+      )}
+
+      {ReactDOM.createPortal(
+        <ModalContainer>
+          <Card>
+            <ModalHeader>
+              <h2>{title}</h2>
+            </ModalHeader>
+            <ModalBody>{message}</ModalBody>
+            <ModalFooter>
+              <Button onClick={onClose}>Okay</Button>
+            </ModalFooter>
+          </Card>
+        </ModalContainer>,
+        document.getElementById("modal-root")!
+      )}
     </>
   );
 };
