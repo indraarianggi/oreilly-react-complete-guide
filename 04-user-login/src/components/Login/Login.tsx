@@ -1,8 +1,15 @@
-import React, { useContext, useEffect, useReducer, useState } from "react";
+import React, {
+  useContext,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import styled from "styled-components";
 import { AuthContext } from "../../store/auth-context";
 import Button from "../UI/Button/Button";
 import Card from "../UI/Card/Card";
+import Input, { TFocusHandler } from "../UI/Input/Input";
 
 const LoginWrapper = styled.div`
   width: 90%;
@@ -13,50 +20,6 @@ const LoginWrapper = styled.div`
 
 const Form = styled.form`
   padding: 2rem;
-`;
-
-interface IFormControlProps {
-  invalid: boolean;
-}
-
-const FormControl = styled.div<IFormControlProps>`
-  margin: 1rem 0;
-  display: flex;
-  align-items: stretch;
-  flex-direction: column;
-
-  @media (min-width: 768px) {
-    align-items: center;
-    flex-direction: row;
-  }
-
-  & label,
-  & input {
-    display: block;
-  }
-
-  & label {
-    font-weight: bold;
-    flex: 1;
-    color: #464646;
-    margin-bottom: 0.5rem;
-  }
-
-  & input {
-    color: ${(props) => (props.invalid ? "red" : "inherit")};
-    background: ${(props) => (props.invalid ? "#fbdada" : "inherit")};
-    flex: 3;
-    font: inherit;
-    padding: 0.35rem 0.35rem;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-  }
-
-  & input:focus {
-    outline: none;
-    border-color: #4f005f;
-    background: #f6dbfc;
-  }
 `;
 
 const FormAction = styled.div`
@@ -154,43 +117,51 @@ const Login = (props: TLoginProps) => {
     dispatchPassword({ type: "INPUT_BLUR" });
   };
 
+  const emailInputRef = useRef<TFocusHandler>(null);
+  const passwordInputRef = useRef<TFocusHandler>(null);
+
   const submitHandler = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    authContext.onLogin(emailState.value, passwordState.value);
+
+    if (formIsValid) {
+      authContext.onLogin(emailState.value, passwordState.value);
+    } else if (!emailState.isValid) {
+      emailInputRef.current?.focusBos();
+    } else {
+      passwordInputRef.current?.focusBos();
+    }
   };
 
   return (
     <LoginWrapper>
       <Card>
         <Form onSubmit={submitHandler}>
-          <FormControl invalid={!emailState.isValid}>
-            <label htmlFor="email">E-Mail</label>
-            <input
-              type="email"
-              name="email"
-              id="email"
-              value={emailState.value}
-              onChange={emailChangeHandler}
-              onBlur={validateEmailHandler}
-            />
-          </FormControl>
+          <Input
+            ref={emailInputRef}
+            label="E-mail"
+            type="email"
+            name="email"
+            id="email"
+            value={emailState.value}
+            invalid={!emailState.isValid}
+            onChange={emailChangeHandler}
+            onBlur={validateEmailHandler}
+          />
 
-          <FormControl invalid={!passwordState.isValid}>
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              name="password"
-              id="password"
-              value={passwordState.value}
-              onChange={passwordChangeHandler}
-              onBlur={validatePasswordHandler}
-            />
-          </FormControl>
+          <Input
+            ref={passwordInputRef}
+            label="Password"
+            type="password"
+            name="password"
+            id="password"
+            value={passwordState.value}
+            invalid={!passwordState.isValid}
+            onChange={passwordChangeHandler}
+            onBlur={validatePasswordHandler}
+          />
 
           <FormAction>
-            <Button type="submit" disabled={!formIsValid}>
-              Login
-            </Button>
+            <Button type="submit">Login</Button>
           </FormAction>
         </Form>
       </Card>
