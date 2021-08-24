@@ -18,16 +18,13 @@ const Header = styled.header`
   }
 `;
 
-type TMainHeaderProps = {
-  isAuthenticated: boolean;
-  onLogout: () => void;
-};
+type TMainHeaderProps = {};
 
-const MainHeader = ({ isAuthenticated, onLogout }: TMainHeaderProps) => {
+const MainHeader = (props: TMainHeaderProps) => {
   return (
     <Header>
       <h1>A Typical Page</h1>
-      <Navigation isLoggedIn={isAuthenticated} onLogout={onLogout} />
+      <Navigation />
     </Header>
   );
 };

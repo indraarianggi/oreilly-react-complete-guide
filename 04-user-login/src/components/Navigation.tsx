@@ -1,4 +1,6 @@
+import { useContext } from "react";
 import styled from "styled-components";
+import { AuthContext } from "../store/auth-context";
 
 const Nav = styled.nav`
   & ul {
@@ -46,16 +48,15 @@ const Nav = styled.nav`
   }
 `;
 
-type TNavigationProps = {
-  isLoggedIn: boolean;
-  onLogout: () => void;
-};
+type TNavigationProps = {};
 
-const Navigation = ({ isLoggedIn, onLogout }: TNavigationProps) => {
+const Navigation = (props: TNavigationProps) => {
+  const authContext = useContext(AuthContext);
+
   return (
     <Nav>
       <ul>
-        {isLoggedIn && (
+        {authContext.isLoggedIn && (
           <>
             <li>
               <a href="/">Users</a>
@@ -64,7 +65,7 @@ const Navigation = ({ isLoggedIn, onLogout }: TNavigationProps) => {
               <a href="/">Admin</a>
             </li>
             <li>
-              <button onClick={onLogout}>Logout</button>
+              <button onClick={authContext.onLogout}>Logout</button>
             </li>
           </>
         )}

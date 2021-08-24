@@ -1,5 +1,6 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import styled from "styled-components";
+import { AuthContext } from "../../store/auth-context";
 import Button from "../UI/Button/Button";
 import Card from "../UI/Card/Card";
 
@@ -62,9 +63,7 @@ const FormAction = styled.div`
   text-align: center;
 `;
 
-type TLoginProps = {
-  onLogin: (email: string, password: string) => void;
-};
+type TLoginProps = {};
 
 type ACTION_TYPE =
   | { type: "USER_INPUT"; payload: string }
@@ -110,7 +109,9 @@ const passwordReducer = (
   return initialPasswordState;
 };
 
-const Login = ({ onLogin }: TLoginProps) => {
+const Login = (props: TLoginProps) => {
+  const authContext = useContext(AuthContext);
+
   const [formIsValid, setFormIsValid] = useState<boolean>(false);
 
   const [emailState, dispatchEmail] = useReducer(
@@ -155,7 +156,7 @@ const Login = ({ onLogin }: TLoginProps) => {
 
   const submitHandler = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    onLogin(emailState.value, passwordState.value);
+    authContext.onLogin(emailState.value, passwordState.value);
   };
 
   return (
