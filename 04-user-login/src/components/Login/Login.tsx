@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import styled from "styled-components";
 import Button from "../UI/Button/Button";
 import Card from "../UI/Card/Card";
@@ -66,72 +66,122 @@ type TLoginProps = {
   onLogin: (email: string, password: string) => void;
 };
 
+type ACTION_TYPE =
+  | { type: "USER_INPUT"; payload: string }
+  | { type: "INPUT_BLUR" };
+
+const initialEmailState = {
+  value: "",
+  isValid: false,
+};
+
+const emailReducer = (
+  state: typeof initialEmailState,
+  action: ACTION_TYPE
+): typeof initialEmailState => {
+  if (action.type === "USER_INPUT") {
+    return { value: action.payload, isValid: action.payload.includes("@") };
+  }
+
+  if (action.type === "INPUT_BLUR") {
+    return { value: state.value, isValid: state.value.includes("@") };
+  }
+
+  return initialEmailState;
+};
+
+const initialPasswordState = {
+  value: "",
+  isValid: false,
+};
+
+const passwordReducer = (
+  state: typeof initialPasswordState,
+  action: ACTION_TYPE
+): typeof initialPasswordState => {
+  if (action.type === "USER_INPUT") {
+    return { value: action.payload, isValid: action.payload.trim().length > 6 };
+  }
+
+  if (action.type === "INPUT_BLUR") {
+    return { value: state.value, isValid: state.value.trim().length > 6 };
+  }
+
+  return initialPasswordState;
+};
+
 const Login = ({ onLogin }: TLoginProps) => {
-  const [form, setForm] = useState({ email: "", password: "" });
-  const [emailIsValid, setEmailIsValid] = useState<boolean>(true);
-  const [passwordIsValid, setPasswordIsValid] = useState<boolean>(true);
   const [formIsValid, setFormIsValid] = useState<boolean>(false);
+
+  const [emailState, dispatchEmail] = useReducer(
+    emailReducer,
+    initialEmailState
+  );
+
+  const [passwordState, dispatchPassword] = useReducer(
+    passwordReducer,
+    initialPasswordState
+  );
 
   useEffect(() => {
     // debounce strategy using timeout
     const identifier = setTimeout(() => {
-      console.log("Validate");
-      setFormIsValid(
-        form.email.includes("@") && form.password.trim().length > 6
-      );
+      console.log("VALIDATE");
+      setFormIsValid(emailState.isValid && passwordState.isValid);
     }, 500);
 
     // cleanup function
     return () => {
-      console.log(identifier);
+      console.log("CLEANUP", identifier);
       clearTimeout(identifier);
     };
-  }, [form]);
+  }, [emailState.isValid, passwordState.isValid]);
 
-  const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm((prevValues) => ({
-      ...prevValues,
-      [e.target.name]: e.target.value,
-    }));
+  const emailChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatchEmail({ type: "USER_INPUT", payload: e.target.value });
   };
 
   const validateEmailHandler = () => {
-    setEmailIsValid(form.email.includes("@"));
+    dispatchEmail({ type: "INPUT_BLUR" });
+  };
+
+  const passwordChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatchPassword({ type: "USER_INPUT", payload: e.target.value });
   };
 
   const validatePasswordHandler = () => {
-    setPasswordIsValid(form.password.trim().length > 6);
+    dispatchPassword({ type: "INPUT_BLUR" });
   };
 
   const submitHandler = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    onLogin(form.email, form.password);
+    onLogin(emailState.value, passwordState.value);
   };
 
   return (
     <LoginWrapper>
       <Card>
         <Form onSubmit={submitHandler}>
-          <FormControl invalid={!emailIsValid}>
+          <FormControl invalid={!emailState.isValid}>
             <label htmlFor="email">E-Mail</label>
             <input
               type="email"
               name="email"
               id="email"
-              value={form.email}
-              onChange={changeHandler}
+              value={emailState.value}
+              onChange={emailChangeHandler}
               onBlur={validateEmailHandler}
             />
           </FormControl>
 
-          <FormControl invalid={!passwordIsValid}>
+          <FormControl invalid={!passwordState.isValid}>
             <label htmlFor="password">Password</label>
             <input
               type="password"
               name="password"
               id="password"
-              value={form.password}
-              onChange={changeHandler}
+              value={passwordState.value}
+              onChange={passwordChangeHandler}
               onBlur={validatePasswordHandler}
             />
           </FormControl>
