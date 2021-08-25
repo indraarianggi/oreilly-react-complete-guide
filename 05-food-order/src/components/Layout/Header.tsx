@@ -33,12 +33,16 @@ const ImageWrapper = styled.div`
   }
 `;
 
-const Header = () => {
+type THeaderProps = {
+  onShowCart: () => void;
+};
+
+const Header = ({ onShowCart }: THeaderProps) => {
   return (
     <>
       <HeaderBase>
         <h1>ReactMeals</h1>
-        <CartButton />
+        <CartButton onClick={onShowCart} />
       </HeaderBase>
       <ImageWrapper>
         <img src={mealsImage} alt="A table full of delicious food!" />

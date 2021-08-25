@@ -60,9 +60,13 @@ const IconWrapper = styled.span`
   margin-right: 0.5rem;
 `;
 
-const CartButton = () => {
+type TCartButtonProps = {
+  onClick: () => void;
+};
+
+const CartButton = ({ onClick }: TCartButtonProps) => {
   return (
-    <CartButtonBase>
+    <CartButtonBase onClick={onClick}>
       <IconWrapper>
         <CartIcon />
       </IconWrapper>
