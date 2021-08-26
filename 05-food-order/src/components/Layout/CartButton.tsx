@@ -1,4 +1,6 @@
+import { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
+import CartContext from "../../store/cart-context";
 import CartIcon from "../Cart/CartIcon";
 
 const Badge = styled.span`
@@ -31,7 +33,7 @@ const CartButtonBase = styled.button`
     background-color: #92320c;
   }
 
-  .bump {
+  &.bump {
     animation: bump 300ms ease-out;
   }
 
@@ -65,13 +67,36 @@ type TCartButtonProps = {
 };
 
 const CartButton = ({ onClick }: TCartButtonProps) => {
+  const [btnIsHighlighted, setBtnIsHighlighted] = useState<boolean>(false);
+
+  const cartCtx = useContext(CartContext);
+
+  const numberOfCartItems = cartCtx.items.reduce((total, item) => {
+    return total + item.amount;
+  }, 0);
+
+  const btnClasses = `${btnIsHighlighted ? "bump" : ""}`;
+
+  useEffect(() => {
+    if (cartCtx.items.length === 0) return;
+
+    setBtnIsHighlighted(true);
+
+    const timer = setTimeout(() => {
+      setBtnIsHighlighted(false);
+    }, 300);
+
+    // cleanup function
+    return () => clearTimeout(timer);
+  }, [cartCtx.items]);
+
   return (
-    <CartButtonBase onClick={onClick}>
+    <CartButtonBase onClick={onClick} className={btnClasses}>
       <IconWrapper>
         <CartIcon />
       </IconWrapper>
       <span>Your Cart</span>
-      <Badge>3</Badge>
+      <Badge>{numberOfCartItems}</Badge>
     </CartButtonBase>
   );
 };

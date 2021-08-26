@@ -1,3 +1,4 @@
+import React from "react";
 import styled from "styled-components";
 
 const InputWrapper = styled.div`
@@ -31,15 +32,15 @@ type TInputProps = {
   };
 };
 
-const Input = (props: TInputProps) => {
+const Input = React.forwardRef<HTMLInputElement, TInputProps>((props, ref) => {
   const { input, label } = props;
 
   return (
     <InputWrapper>
       <label htmlFor={input.id}>{label}</label>
-      <input {...input} />
+      <input ref={ref} {...input} />
     </InputWrapper>
   );
-};
+});
 
 export default Input;

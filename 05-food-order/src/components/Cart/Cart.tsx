@@ -1,10 +1,16 @@
+import { useContext } from "react";
 import styled from "styled-components";
+import CartContext, { ICartItem } from "../../store/cart-context";
 import Modal from "../UI/Modal";
+import CartItem from "./CartItem";
 
 const CartList = styled.ul`
   list-style: none;
   margin: 0;
   padding: 0;
+
+  max-height: 20rem;
+  overflow: scroll;
 `;
 
 const Total = styled.div`
@@ -51,10 +57,33 @@ type TCartProps = {
 };
 
 const Cart = ({ onClose }: TCartProps) => {
+  const cartCtx = useContext(CartContext);
+
+  const totalAmount = `$${cartCtx.totalAmount.toFixed(2)}`;
+  const hasItems = cartCtx.items.length > 0;
+
+  const cartItemRemoveHandler = (id: string) => {
+    cartCtx.removeItem(id);
+  };
+
+  const cartItemAddHandler = (item: ICartItem) => {
+    cartCtx.addItem({
+      ...item,
+      amount: 1,
+    });
+  };
+
   const cartList = (
     <CartList>
-      {[{ id: "c1", name: "Sushi", amount: 2, price: 12.99 }].map((item) => (
-        <li key={item.id}>{item.name}</li>
+      {cartCtx.items.map((item) => (
+        <CartItem
+          key={item.id}
+          name={item.name}
+          price={item.price}
+          amount={item.amount}
+          onRemove={cartItemRemoveHandler.bind(null, item.id)}
+          onAdd={cartItemAddHandler.bind(null, item)}
+        />
       ))}
     </CartList>
   );
@@ -64,13 +93,13 @@ const Cart = ({ onClose }: TCartProps) => {
       {cartList}
       <Total>
         <span>Total Amount</span>
-        <span>35.62</span>
+        <span>{totalAmount}</span>
       </Total>
       <Actions>
         <button className="button--alt" onClick={onClose}>
           Close
         </button>
-        <button className="button">Order</button>
+        {hasItems && <button className="button">Order</button>}
       </Actions>
     </Modal>
   );
