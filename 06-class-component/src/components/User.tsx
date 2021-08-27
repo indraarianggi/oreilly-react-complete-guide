@@ -7,6 +7,11 @@ type TUserProps = {
 };
 
 class User extends Component<TUserProps> {
+  // called when a component unmounted
+  componentWillUnmount() {
+    console.log("User component unmounted");
+  }
+
   render() {
     return <li className={styles.user}>{this.props.name}</li>;
   }

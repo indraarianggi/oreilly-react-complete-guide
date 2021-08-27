@@ -3,18 +3,14 @@ import User from "./User";
 
 import styles from "./Users.module.css";
 
-interface IUser {
+export interface IUser {
   id: string;
   name: string;
 }
 
-const DUMMY_USERS: IUser[] = [
-  { id: "u1", name: "Max" },
-  { id: "u2", name: "Manuel" },
-  { id: "u3", name: "Julie" },
-];
-
-type TUsersProps = {};
+type TUsersProps = {
+  users: IUser[];
+};
 
 type TUsersState = {
   showUsers: boolean;
@@ -33,7 +29,7 @@ class Users extends Component<TUsersProps, TUsersState> {
   render() {
     const usersList = (
       <ul>
-        {DUMMY_USERS.map((user) => (
+        {this.props.users.map((user) => (
           <User key={user.id} name={user.name} />
         ))}
       </ul>
