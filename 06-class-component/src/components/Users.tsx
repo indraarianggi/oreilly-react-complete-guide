@@ -22,6 +22,13 @@ class Users extends Component<TUsersProps, TUsersState> {
     showUsers: false,
   };
 
+  // To test React Error Boundary
+  componentDidUpdate() {
+    if (this.props.users.length === 0) {
+      throw new Error("No users provided!");
+    }
+  }
+
   toggleUsersHandler() {
     this.setState((prevState) => ({ showUsers: !prevState.showUsers }));
   }
