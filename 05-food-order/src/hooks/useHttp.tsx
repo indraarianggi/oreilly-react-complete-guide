@@ -8,7 +8,7 @@ const useHttp = () => {
     async <T extends unknown>(
       url: string,
       reqConfig: RequestInit,
-      onSuccess: (data: T) => void
+      onSuccess?: (data: T) => void
     ) => {
       setIsLoading(true);
       setError(null);
@@ -23,7 +23,7 @@ const useHttp = () => {
         const data: T = await response.json();
         console.log({ data });
 
-        onSuccess(data);
+        if (onSuccess) onSuccess(data);
       } catch (err: any) {
         setError(err.message || "Something went wrong!");
       }

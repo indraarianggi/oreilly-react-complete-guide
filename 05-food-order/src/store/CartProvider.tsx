@@ -8,7 +8,8 @@ interface ICartState {
 
 type CART_ACTION_TYPE =
   | { type: "ADD"; item: ICartItem }
-  | { type: "REMOVE"; id: string };
+  | { type: "REMOVE"; id: string }
+  | { type: "CLEAR" };
 
 const defaultCartState: ICartState = {
   items: [],
@@ -72,6 +73,8 @@ const cartReducer = (
 
       // return new/updated state
       return { items: updatedItems2, totalAmount: updatedTotalAmount2 };
+    case "CLEAR":
+      return defaultCartState;
     default:
       return defaultCartState;
   }
@@ -92,11 +95,16 @@ const CartProvider = ({ children }: TCartProviderProps) => {
     dispatchCart({ type: "REMOVE", id: id });
   };
 
+  const clearCartHandler = () => {
+    dispatchCart({ type: "CLEAR" });
+  };
+
   const cartContext = {
     items: cartState.items,
     totalAmount: cartState.totalAmount,
     addItem: addItemToCartHandler,
     removeItem: removeItemFromCartHandler,
+    clearCart: clearCartHandler,
   };
 
   return (

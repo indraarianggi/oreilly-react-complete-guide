@@ -1,8 +1,10 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import styled from "styled-components";
+import useHttp from "../../hooks/useHttp";
 import CartContext, { ICartItem } from "../../store/cart-context";
 import Modal from "../UI/Modal";
 import CartItem from "./CartItem";
+import Checkout, { TUserData } from "./Checkout";
 
 const CartList = styled.ul`
   list-style: none;
@@ -59,6 +61,11 @@ type TCartProps = {
 const Cart = ({ onClose }: TCartProps) => {
   const cartCtx = useContext(CartContext);
 
+  const { isLoading: isSubmitting, sendRequest } = useHttp();
+  const [isSuccessSubmit, setIsSuccessSubmit] = useState<boolean>(false);
+
+  const [isCheckout, setIsCheckout] = useState<boolean>(false);
+
   const totalAmount = `$${cartCtx.totalAmount.toFixed(2)}`;
   const hasItems = cartCtx.items.length > 0;
 
@@ -71,6 +78,24 @@ const Cart = ({ onClose }: TCartProps) => {
       ...item,
       amount: 1,
     });
+  };
+
+  const orderHandler = () => {
+    setIsCheckout(true);
+  };
+
+  const submitOrderHandler = (data: TUserData) => {
+    sendRequest(
+      "https://oreily-react-http-default-rtdb.asia-southeast1.firebasedatabase.app/orders.json",
+      {
+        method: "POST",
+        body: JSON.stringify({ user: data, orderedItems: cartCtx.items }),
+      },
+      (data) => {
+        setIsSuccessSubmit(true);
+        cartCtx.clearCart();
+      }
+    );
   };
 
   const cartList = (
@@ -88,19 +113,51 @@ const Cart = ({ onClose }: TCartProps) => {
     </CartList>
   );
 
-  return (
-    <Modal onClose={onClose}>
+  const modalActions = (
+    <Actions>
+      <button className="button--alt" onClick={onClose}>
+        Close
+      </button>
+      {hasItems && (
+        <button className="button" onClick={orderHandler}>
+          Order
+        </button>
+      )}
+    </Actions>
+  );
+
+  const cartModalContent = (
+    <>
       {cartList}
       <Total>
         <span>Total Amount</span>
         <span>{totalAmount}</span>
       </Total>
+      {isCheckout && (
+        <Checkout onConfirm={submitOrderHandler} onCancel={onClose} />
+      )}
+      {!isCheckout && modalActions}
+    </>
+  );
+
+  const isSubmittingModalContent = <p>Sending order data...</p>;
+
+  const successSubmitModalContent = (
+    <>
+      <p>Successfully sent the order!</p>
       <Actions>
-        <button className="button--alt" onClick={onClose}>
+        <button className="button" onClick={onClose}>
           Close
         </button>
-        {hasItems && <button className="button">Order</button>}
       </Actions>
+    </>
+  );
+
+  return (
+    <Modal onClose={onClose}>
+      {!isSubmitting && !isSuccessSubmit && cartModalContent}
+      {isSubmitting && isSubmittingModalContent}
+      {!isSubmitting && isSuccessSubmit && successSubmitModalContent}
     </Modal>
   );
 };
