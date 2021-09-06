@@ -26,7 +26,7 @@ const Price = styled.div`
   font-size: 1.25rem;
 `;
 
-type TMealItemProps = {
+export type TMealItemProps = {
   id: string;
   name: string;
   description: string;

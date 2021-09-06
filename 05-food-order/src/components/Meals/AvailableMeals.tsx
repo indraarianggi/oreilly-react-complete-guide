@@ -1,6 +1,8 @@
+import { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
+import useHttp from "../../hooks/useHttp";
 import Card from "../UI/Card";
-import MealItem from "./MealItem/MealItem";
+import MealItem, { TMealItemProps } from "./MealItem/MealItem";
 
 const AvailableMealsSection = styled.section`
   max-width: 60rem;
@@ -27,35 +29,66 @@ const AvailableMealsSection = styled.section`
   }
 `;
 
-const DUMMY_MEALS = [
-  {
-    id: "m1",
-    name: "Sushi",
-    description: "Finest fish and veggies",
-    price: 22.99,
-  },
-  {
-    id: "m2",
-    name: "Schnitzel",
-    description: "A german specialty!",
-    price: 16.5,
-  },
-  {
-    id: "m3",
-    name: "Barbecue Burger",
-    description: "American, raw, meaty",
-    price: 12.99,
-  },
-  {
-    id: "m4",
-    name: "Green Bowl",
-    description: "Healthy...and green...",
-    price: 18.99,
-  },
-];
+const LoadingSection = styled.section`
+  text-align: center;
+  color: white;
+`;
+
+const ErrorSection = styled.section`
+  text-align: center;
+  color: red;
+`;
+
+interface IMealResponse {
+  [key: string]: {
+    name: string;
+    description: string;
+    price: number;
+  };
+}
 
 const AvailableMeals = () => {
-  const mealsList = DUMMY_MEALS.map((meal) => (
+  const { isLoading, error, sendRequest } = useHttp();
+
+  const [meals, setMeals] = useState<TMealItemProps[]>([]);
+
+  const fetchMeals = useCallback(() => {
+    sendRequest<IMealResponse>(
+      "https://oreily-react-http-default-rtdb.asia-southeast1.firebasedatabase.app/meals.json",
+      {},
+      (data) => {
+        const loadedMeals: TMealItemProps[] = [];
+
+        for (const mealKey in data) {
+          loadedMeals.push({ id: mealKey, ...data[mealKey] });
+        }
+
+        setMeals(loadedMeals);
+      }
+    );
+  }, [sendRequest]);
+
+  useEffect(() => {
+    fetchMeals();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <LoadingSection>
+        <p>Loading...</p>
+      </LoadingSection>
+    );
+  }
+
+  if (error) {
+    return (
+      <ErrorSection>
+        <p>{error}</p>
+      </ErrorSection>
+    );
+  }
+
+  const mealsList = meals.map((meal) => (
     <MealItem
       key={meal.id}
       id={meal.id}
