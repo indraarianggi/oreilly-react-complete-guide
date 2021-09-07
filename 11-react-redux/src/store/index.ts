@@ -1,59 +1,17 @@
-import { createStore, Store } from "redux";
-
-export type TState = {
-  counter: number;
-  showCounter: boolean;
-};
-
-type TAction =
-  | { type: "INCREMENT" }
-  | { type: "DECREMENT" }
-  | { type: "INCREASE"; payload: number }
-  | { type: "TOGGLE" };
-
-const initialState: TState = {
-  counter: 0,
-  showCounter: true,
-};
-
-/**
- * Reducer Function
- */
-const counterReducer = (
-  state: TState = initialState,
-  action: TAction
-): TState => {
-  switch (action.type) {
-    case "INCREMENT":
-      return {
-        ...state,
-        counter: state.counter + 1,
-      };
-    case "DECREMENT":
-      return {
-        ...state,
-        counter: state.counter - 1,
-      };
-    case "INCREASE":
-      return {
-        ...state,
-        counter: state.counter + action.payload,
-      };
-    case "TOGGLE":
-      return {
-        ...state,
-        showCounter: !state.showCounter,
-      };
-    default:
-      return state;
-  }
-};
+import { configureStore } from "@reduxjs/toolkit";
+import authSlice from "./authentication";
+import counterSlice from "./counter";
 
 /**
  * Store
  */
-const store: Store<TState, TAction> = createStore(counterReducer);
+const store = configureStore({
+  reducer: {
+    counter: counterSlice.reducer,
+    auth: authSlice.reducer,
+  },
+});
 
-export type TDispatch = typeof store.dispatch;
+export type RootState = ReturnType<typeof store.getState>;
 
 export default store;
