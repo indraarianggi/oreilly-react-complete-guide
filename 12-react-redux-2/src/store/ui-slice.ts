@@ -1,11 +1,18 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+interface INotification {
+  status: "pending" | "error" | "success";
+  title: string;
+  message: string;
+}
 interface IUIState {
   showCart: boolean;
+  notification: INotification | null;
 }
 
 const initialUIState: IUIState = {
   showCart: false,
+  notification: null,
 };
 
 /**
@@ -17,6 +24,9 @@ const uiSlice = createSlice({
   reducers: {
     toggleCart: (state) => {
       state.showCart = !state.showCart;
+    },
+    showNotification: (state, action: PayloadAction<INotification>) => {
+      state.notification = action.payload;
     },
   },
 });

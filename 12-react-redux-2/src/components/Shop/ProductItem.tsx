@@ -1,9 +1,9 @@
+import { useDispatch } from "react-redux";
 import Card from "../UI/Card";
 import { IProduct } from "./Products";
+import { cartActions } from "../../store/cart-slice";
 
 import styles from "./ProductItem.module.css";
-import { useDispatch } from "react-redux";
-import { cartActions } from "../../store/cart-slice";
 
 type TProductItemProps = IProduct;
 
