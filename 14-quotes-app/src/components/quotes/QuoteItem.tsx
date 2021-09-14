@@ -1,9 +1,11 @@
-import styles from "./QuoteItem.module.css";
+import { Link } from "react-router-dom";
 import { IQuote } from "./QuoteList";
+
+import styles from "./QuoteItem.module.css";
 
 type TQuoteItemProps = IQuote;
 
-const QuoteItem = ({ author, text }: TQuoteItemProps) => {
+const QuoteItem = ({ id, author, text }: TQuoteItemProps) => {
   return (
     <li className={styles.item}>
       <figure>
@@ -12,7 +14,9 @@ const QuoteItem = ({ author, text }: TQuoteItemProps) => {
         </blockquote>
         <figcaption>{author}</figcaption>
       </figure>
-      <a className="btn">View Fullscreen</a>
+      <Link to={`/quotes/${id}`} className="btn">
+        View Fullscreen
+      </Link>
     </li>
   );
 };
