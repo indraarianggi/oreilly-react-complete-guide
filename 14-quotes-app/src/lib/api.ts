@@ -15,7 +15,7 @@ interface IAddQuoteResponse {
 }
 
 interface IGetAllCommentsReponse {
-  [key: string]: Omit<IComment, "id">;
+  [key: string]: string;
 }
 
 export const getAllQuotes = async (): Promise<IQuote[]> => {
@@ -76,17 +76,20 @@ export const addQuote = async (
   return null;
 };
 
-export const addComment = async (
-  commentData: Omit<IComment, "id">,
-  quoteId: string
-): Promise<{ commentId: string }> => {
-  const response = await fetch(`${FIREBASE_DOMAIN}/comments/${quoteId}.json`, {
-    method: "POST",
-    body: JSON.stringify(commentData),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+export const addComment = async (inputData: {
+  commentText: Omit<IComment, "id">;
+  quoteId: string;
+}): Promise<{ commentId: string }> => {
+  const response = await fetch(
+    `${FIREBASE_DOMAIN}/comments/${inputData.quoteId}.json`,
+    {
+      method: "POST",
+      body: JSON.stringify(inputData.commentText),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
 
   if (!response.ok) {
     throw new Error("Could not add comment.");
@@ -111,7 +114,7 @@ export const getAllComments = async (quoteId: string): Promise<IComment[]> => {
   for (const key in data) {
     const commentObj = {
       id: key,
-      ...data[key],
+      text: data[key],
     };
 
     transformedComments.push(commentObj);
