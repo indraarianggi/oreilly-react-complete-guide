@@ -1,4 +1,4 @@
-import type { NextPage } from "next";
+import type { InferGetStaticPropsType } from "next";
 import MeetupList from "../components/meetups/MeetupList";
 import { IMeetup } from "../interfaces";
 
@@ -21,8 +21,17 @@ const DUMMY_MEETUPS: IMeetup[] = [
   },
 ];
 
-const Home: NextPage = () => {
-  return <MeetupList meetups={DUMMY_MEETUPS} />;
+export const getStaticProps = async () => {
+  return {
+    props: {
+      meetups: DUMMY_MEETUPS,
+    },
+    revalidate: 10, // (in seconds) This will unlock incremental static regeneration feature
+  };
+};
+
+const Home = ({ meetups }: InferGetStaticPropsType<typeof getStaticProps>) => {
+  return <MeetupList meetups={meetups} />;
 };
 
 export default Home;
