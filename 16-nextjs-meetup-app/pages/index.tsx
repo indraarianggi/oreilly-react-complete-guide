@@ -1,6 +1,7 @@
 import { MongoClient } from "mongodb";
 
 import type { InferGetStaticPropsType } from "next";
+import Head from "next/head";
 import MeetupList from "../components/meetups/MeetupList";
 
 export const getStaticProps = async () => {
@@ -31,7 +32,18 @@ export const getStaticProps = async () => {
 };
 
 const Home = ({ meetups }: InferGetStaticPropsType<typeof getStaticProps>) => {
-  return <MeetupList meetups={meetups} />;
+  return (
+    <>
+      <Head>
+        <title>React Meetups</title>
+        <meta
+          name="description"
+          content="Browse a huge list of highly active React meetups!"
+        />
+      </Head>
+      <MeetupList meetups={meetups} />
+    </>
+  );
 };
 
 export default Home;
