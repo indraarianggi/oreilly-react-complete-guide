@@ -1,30 +1,30 @@
+import { MongoClient } from "mongodb";
+
 import type { InferGetStaticPropsType } from "next";
 import MeetupList from "../components/meetups/MeetupList";
-import { IMeetup } from "../interfaces";
-
-const DUMMY_MEETUPS: IMeetup[] = [
-  {
-    id: "m1",
-    title: "A First Meetup",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Stadtbild_M%C3%BCnchen.jpg/1280px-Stadtbild_M%C3%BCnchen.jpg",
-    address: "Some address 5, 12345 Some City",
-    description: "This is a first meetup!",
-  },
-  {
-    id: "m2",
-    title: "A Second Meetup",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Stadtbild_M%C3%BCnchen.jpg/1280px-Stadtbild_M%C3%BCnchen.jpg",
-    address: "Some address 10, 12345 Some City",
-    description: "This is a second meetup!",
-  },
-];
 
 export const getStaticProps = async () => {
+  // fetch data from an API
+  const client = await MongoClient.connect(
+    "mongodb+srv://indraarianggi:1234567890@cluster0.gopha.mongodb.net/meetups?retryWrites=true&w=majority"
+  );
+  const db = client.db();
+
+  const meetupsCollection = db.collection("meetups");
+
+  const meetups = await meetupsCollection.find().toArray();
+
+  client.close();
+
   return {
     props: {
-      meetups: DUMMY_MEETUPS,
+      meetups: meetups.map((meetup) => ({
+        id: meetup._id.toString(),
+        title: meetup.title,
+        image: meetup.image,
+        address: meetup.address,
+        description: meetup.description,
+      })),
     },
     revalidate: 10, // (in seconds) This will unlock incremental static regeneration feature
   };
